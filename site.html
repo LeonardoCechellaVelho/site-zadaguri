@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Mural dos Memes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center">
+  <header class="w-full bg-gray-600 text-white py-4 text-center text-2xl font-bold shadow">
+    Zadaguri Memes
+  </header>
+
+  <main class="w-full max-w-2xl mt-6 px-4">
+    <!-- Formulário -->
+    <div class="bg-white rounded-2xl p-4 shadow mb-6">
+      <h2 class="text-lg font-semibold mb-2">Postar um meme</h2>
+      <input id="imageUrl" type="text" placeholder="Link da imagem (jpg/png)" class="w-full p-2 border rounded mb-2">
+      <textarea id="caption" placeholder="Escreva sua história aqui..." class="w-full p-2 border rounded mb-2"></textarea>
+      <button onclick="addPost()" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 w-full">
+        Postar
+      </button>
+    </div>
+
+    <!-- Feed -->
+    <div id="feed" class="space-y-6"></div>
+  </main>
+
+  <script>
+    function loadPosts() {
+      const posts = JSON.parse(localStorage.getItem("posts")) || [];
+      const feed = document.getElementById("feed");
+      feed.innerHTML = "";
+      posts.forEach(post => {
+        const postEl = document.createElement("div");
+        postEl.className = "bg-white rounded-2xl p-4 shadow";
+        postEl.innerHTML = `
+          <img src="${post.image}" alt="Meme" class="w-full rounded-lg mb-2">
+          <p class="text-gray-700">${post.caption}</p>
+        `;
+        feed.prepend(postEl);
+      });
+    }
+
+    function addPost() {
+      const image = document.getElementById("imageUrl").value;
+      const caption = document.getElementById("caption").value;
+      if (!image || !caption) return alert("Preencha tudo!");
+      const posts = JSON.parse(localStorage.getItem("posts")) || [];
+      posts.push({ image, caption });
+      localStorage.setItem("posts", JSON.stringify(posts));
+      document.getElementById("imageUrl").value = "";
+      document.getElementById("caption").value = "";
+      loadPosts();
+    }
+
+    loadPosts();
+  </script>
+</body>
+</html>
