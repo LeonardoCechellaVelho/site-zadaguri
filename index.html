@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <title>Mural dos Memes</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-gray-100 min-h-screen flex flex-col items-center">
   <header class="w-full bg-gray-600 text-white py-4 text-center text-2xl font-bold shadow">
     Zadaguri Memes
@@ -15,7 +17,8 @@
     <div class="bg-white rounded-2xl p-4 shadow mb-6">
       <h2 class="text-lg font-semibold mb-2">Postar um meme</h2>
       <input id="imageUrl" type="text" placeholder="Link da imagem (jpg/png)" class="w-full p-2 border rounded mb-2">
-      <textarea id="caption" placeholder="Escreva sua história aqui..." class="w-full p-2 border rounded mb-2"></textarea>
+      <textarea id="caption" placeholder="Escreva sua história aqui..."
+        class="w-full p-2 border rounded mb-2"></textarea>
       <button onclick="addPost()" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 w-full">
         Postar
       </button>
@@ -41,19 +44,38 @@
       });
     }
 
-    function addPost() {
+    async function addPost() {
       const image = document.getElementById("imageUrl").value;
       const caption = document.getElementById("caption").value;
       if (!image || !caption) return alert("Preencha tudo!");
-      const posts = JSON.parse(localStorage.getItem("posts")) || [];
-      posts.push({ image, caption });
-      localStorage.setItem("posts", JSON.stringify(posts));
-      document.getElementById("imageUrl").value = "";
-      document.getElementById("caption").value = "";
-      loadPosts();
+
+      const meme = { image, caption };
+
+      const res = await fetch(
+        "https://api.github.com/repos/LeonardoCechellaVelho/site-zadaguri/dispatches",
+        {
+          method: "POST",
+          headers: {
+            Accept: "application/vnd.github+json",
+            Authorization: "Bearer SEU_TOKEN", // ⚠️ só para teste, já falo da parte segura
+          },
+          body: JSON.stringify({
+            event_type: "save-meme",
+            client_payload: { meme },
+          }),
+        }
+      );
+
+      if (res.ok) {
+        alert("Meme enviado! Ele será salvo em breve.");
+      } else {
+        alert("Erro ao enviar meme.");
+      }
     }
+
 
     loadPosts();
   </script>
 </body>
+
 </html>

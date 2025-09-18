@@ -1,0 +1,30 @@
+name: Save Meme
+
+on:
+  repository_dispatch:
+    types: [save-meme]
+
+jobs:
+  add-meme:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Criar/atualizar posts.json
+        run: |
+          echo '${{ toJson(github.event.client_payload.meme) }}' > new_meme.json
+          node .github/workflows/update-posts.js
+
+      - name: Commit e Push
+        run: |
+          git add posts.json
+          git commit -m "Novo meme adicionado via dispatch"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
